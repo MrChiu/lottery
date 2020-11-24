@@ -87,6 +87,15 @@ class DBTool(object):
         except Exception as e:
             log.error('query error: ', e)
             return []
+        
+
+    def close(self):
+        """
+        关闭数据库相关连接的函数
+        :return:
+        """
+        self.dbcur.close()
+        self.conn.close()
 
 
 # 序列化
