@@ -1,15 +1,17 @@
 #! ~/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
-from tornado import options, web, httpserver, ioloop
 import os.path
-from index_handler import HomeHandler, DatasyncHandler
+from tornado import options, web, httpserver, ioloop
+from handler import HomeConfig, LotteryStart, LotteryStop, LotterySetting
 
 class Application(web.Application):
     def __init__(self):
         handlers = [
-            (r"/", HomeHandler),
-            (r"/dashboard/datasync", DatasyncHandler),
+            (r"/", HomeConfig),
+            (r"/start", LotteryStart),
+            (r"/stop", LotteryStop),
+            (r"/setting", LotterySetting)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -23,6 +25,6 @@ class Application(web.Application):
 
 options.parse_command_line()
 http_server = httpserver.HTTPServer(Application())
-http_server.listen(9999)
+http_server.listen(8888)
 options.define_logging_options = "info"
 ioloop.IOLoop.current().start()

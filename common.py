@@ -1,96 +1,102 @@
-#!/Users/qiudong/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
-import pymysql
-import logging
-
-MYSQL_HOST = "localhost" 
-MYSQL_USER = "root"
-MYSQL_PWD = "abcde"
-MYSQL_DB = "stock"
-
-MYSQL_CONN_URL = "mysql+pymysql://" + MYSQL_USER + ":" + MYSQL_PWD + \
-    "@" + MYSQL_HOST + ":3306/" + MYSQL_DB
-
-class DB(object):
-    def __init__(self, host=MYSQL_HOST, port=3306, db=MYSQL_DB, user=MYSQL_USER, passwd=MYSQL_PWD, charset="utf8mb4"):
-        # 创建数据库连接
-        self.dbconn = pymysql.connect(host=host, port=port, db=db, user=user, passwd=passwd, charset=charset)
-        # 创建字典型游标(返回的数据是字典类型)
-        self.dbcur = self.dbconn.cursor(cursor=pymysql.cursors.DictCursor)
-
-    # __enter__() 和 __exit__() 是with关键字调用的必须方法
-    # with本质上就是调用对象的enter和exit方法
-    def __enter__(self):
-        # 返回游标
-        return self.dbcur
-
-    def __exit__(self, exc_type, exc_value, exc_trace):
-        # 提交事务
-        self.dbconn.commit()
-        # 关闭游标
-        self.dbcur.close()
-        # 关闭数据库连接
-        self.dbconn.close()    
+import sqlite3
+import logging as log
+import json
+import datetime
+from decimal import Decimal
 
 
-# 插入数据。
-def save(sql, params=()):
-    with DB() as db:
-        logging.info("save sql: %s", sql)
+# db工具
+class DBTool(object):
+    def __init__(self):
+        """
+        初始化函数，创建数据库连接
+        """
+        self.conn = sqlite3.connect('lottery.db')
+        self.dbcur = self.conn.cursor()
+        # self.dbcur.execute('''CREATE TABLE IF NOT EXISTS TEST
+        #     (ID INT PRIMARY KEY     NOT NULL,
+        #     NAME           TEXT    NOT NULL,
+        #     AGE            INT     NOT NULL,
+        #     ADDRESS        CHAR(50),
+        #     SALARY         REAL);''')
+
+    def table(self, sql):
         try:
-            db.execute(sql, params)
+            self.dbcur.execute(sql)
         except Exception as e:
-            logging.error("error : %s", e)
+            log.error('table error: ', e)
+        finally:
+            self.conn.commit()
+            self.conn.close()
 
 
-# 查询数据
-def select(sql, params=()):
-    with DB() as db:
-        logging.info("select sql: %s", sql)
+    def save(self, sql, ob):
+        """
+        数据库的插入、修改函数
+        :param sql: 传入的SQL语句
+        :param ob: 传入数据
+        :return: 返回操作数据库状态
+        """
         try:
-            db.execute(sql, params)
+            self.dbcur.executemany(sql, ob)
+            i = self.conn.total_changes
+            if i > 0:
+                return True
+            else:
+                return False
         except Exception as e:
-            logging.error("error : %s", e)
-        result = db.fetchall()
-        if len(result) > 0:
-            return result
+            # print('save error: ', e)
+            log.error('save error: ', e)
+            return False
+        finally:
+            self.conn.commit()
+
+
+    def delete(self, sql, ob):
+        """
+        操作数据库数据删除的函数
+        :param sql: 传入的SQL语句
+        :param ob: 传入数据
+        :return: 返回操作数据库状态
+        """
+        try:
+            self.dbcur.execute(sql, ob)
+            i = self.conn.total_changes
+            if i > 0:
+                return True
+            else:
+                return False
+        except Exception as e:
+            log.error('delete error: ', e)
+            return False
+        finally:
+            self.conn.commit()
+
+
+    def query(self, sql, ob):
+        """
+        数据库数据查询
+        :param sql: 传入的SQL语句
+        :param ob: 传入数据
+        :return: 返回操作数据库状态
+        """
+        try:
+            return self.dbcur.execute(sql, ob)
+        except Exception as e:
+            log.error('query error: ', e)
+            return []
+
+
+# 序列化
+class JsonCustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return str(Decimal(obj).quantize(Decimal('0.0000')))
+        elif isinstance(obj, datetime.datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, datetime.date):
+            return obj.strftime('%Y-%m-%d')
         else:
-            return None
-
-# 查询数据
-def select_one(sql, params=()):
-    with DB() as db:
-        logging.info("select sql: %s", sql)
-        try:
-            db.execute(sql, params)
-        except Exception as e:
-            logging.error("error : %s", e)
-        result = db.fetchone()
-        return result
-
-
-# 计算数量
-def select_count(sql, params=()):
-    with DB() as db:
-        logging.info("select count sql: %s" + sql)
-        try:
-            db.execute(sql, params)
-        except Exception as e:
-            logging.error("error : %s", e)
-        result = db.fetchall()
-        # 只有一个数组中的第一个数据
-        if len(result) == 1:
-            return int(result[0][0])
-        else:
-            return 0
-
-# 删除数据
-def delete(sql, params=()):
-    with DB() as db:
-        logging.info("delete sql: %s", sql)
-        try:
-            db.execute(sql, params)
-        except Exception as e:
-            logging.error("error : %s", e)
-            
+            return json.JSONEncoder.default(self, obj)
