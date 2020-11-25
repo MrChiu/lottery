@@ -33,6 +33,12 @@ configs = find_config('lottery_type_order')
 for config  in configs:
     print(str(config))
 
+    
+# 打分制
+def lottery(persons=[], top=1):
+
+
+
 # 获取配置
 class HomeConfig(web.RequestHandler):
     @gen.coroutine
