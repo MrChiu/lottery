@@ -3,25 +3,15 @@
 
 # 人员信息
 class Person(object):
-
-    def __init__(self):
+    def __init__(self, name, pic, status, win):
         # 姓名
-        self.name = None
-        # 头像
-        self.pic = None
-        # 中奖状态(I:未中奖 s:已中奖)
-        self.status = None
-        # 一等奖优先标记 Y
-        self.first_prize = None
-        # 二等奖优先标记 Y
-        self.second_prize = None
-
-    def init(self, name, pic, status, first_prize, second_prize):
         self.name = name
+        # 头像
         self.pic = pic
+        # 状态(I:未中奖 S:已中奖)
         self.status = status
-        self.first_prize = first_prize
-        self.second_prize = second_prize
+        # 中奖(1,2,3)
+        self.win = win
 
 
 # 配置信息

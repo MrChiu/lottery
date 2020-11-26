@@ -47,7 +47,6 @@ class DBTool(object):
             else:
                 return False
         except Exception as e:
-            # print('save error: ', e)
             log.error('save error: ', e)
             return False
         finally:

@@ -11,32 +11,49 @@ db = DBTool()
 
 
 # 查询人员
-def find_persons(status, first_prize, second_prize):
-    sql = 'select * from test where name = ? and age = ?'
-    temp = db.query(sql, ['name', 12])
-    for st in temp:
-        print('ID:', st[0], '  Name:', st[1], '  Age:', st[2])
+def find_persons(status, appoint_prize1, appoint_prize2):
+    sql = "SELECT * FROM PERSON WHERE STATUS = ? AND APPOINT_PRIZE1 = ? AND APPOINT_PRIZE2 = ?"
+    result = db.query(sql, [status, appoint_prize1, appoint_prize2])
+    persons = []
+    for r in result:
+        persons.append(Person(r[0], r[1], r[2], r[3]))
+        
+
+# 人员更新为中奖
+def update_lucky_dog(name, win):
+    sql = "UPDATE PERSON SET STATUS = 'S', WIN = ? WHERE NAME = ?"
+    return db.save(sql, [(win, name)])
+
+
+# 人员更新为指定抽一等奖
+def update_appoint_prize1(name):
+    sql = "UPDATE PERSON SET APPOINT_PRIZE1 = 'Y' WHERE NAME = ?"
+    return db.save(sql, [(name,)])
+
+
+# 人员更新为指定抽二等奖
+def update_appoint_prize2(name):
+    sql = "UPDATE PERSON SET APPOINT_PRIZE2 = 'Y' WHERE NAME = ?"
+    return db.save(sql, [(name,)])
 
 
 # 查询配置
-def find_config(param_key):
-    sql = 'select * from CONFIG where PARAM_KEY = ?'
+def find_config_val(param_key):
+    sql = 'SELECT * FROM CONFIG WHERE PARAM_KEY = ?'
     result = db.query(sql, [param_key])
     configs = []
     for r in result:
         configs.append(Config(r[0], r[1]))
-    return configs
+    if configs:
+        return configs[0].param_object
+    else:
+        return None
 
 
-configs = find_config('lottery_type_order')
-
-for config  in configs:
-    print(str(config))
-
-    
-# 打分制
-def lottery(persons=[], top=1):
-
+# 更新配置
+def update_config_val(param_key, param_object):
+    sql = 'UPDATE CONFIG SET PARAM_OBJECT = ? WHERE PARAM_KEY = ?'
+    return db.save(sql, [(param_object, param_key)])
 
 
 # 获取配置
@@ -44,30 +61,36 @@ class HomeConfig(web.RequestHandler):
     @gen.coroutine
     def get(self):
         log.info('获取配置')
-
-
-        response = {
-            'code':'0000',
-            'desc':'交易成功',
-            'lottery_type_order': lottery_type_order,
-            'prize1_total_num': prize1_total_num,
-            'prize1_take_count': prize1_take_count,
-            'prize2_total_num': prize2_total_num,
-            'prize2_take_count': prize2_take_count,
-            'prize3_total_num': prize3_total_num,
-            'prize4_take_count': prize3_take_count
-        }
-        self.write(json.dumps(response, cls=JsonCustomEncoder))
-
-
-# 开始抽奖
-class LotteryStart(web.RequestHandler):
-    @gen.coroutine
-    def get(self):
-        log.info('开始抽奖')
-        start_param = self.get_argument("start", default=0, strip=False)
-        response = []
-        self.write(json.dumps(response, cls=JsonCustomEncoder))
+        try:
+            lottery_type_order = find_config_val('lottery_type_orde')
+            prize1_total_num = find_config_val('prize1_total_num')
+            prize1_take_count = find_config_val('prize1_take_count')
+            prize2_total_num = find_config_val('prize2_total_num')
+            prize2_take_count = find_config_val('prize2_take_count')
+            prize3_total_num = find_config_val('prize3_total_num')
+            prize3_take_count = find_config_val('prize3_take_count')
+            special_prize1_person = find_config_val('special_prize1_person')
+            special_prize2_person = find_config_val('special_prize2_person')
+            response = {
+                'code':'0000',
+                'desc':'交易成功',
+                'lottery_type_order': lottery_type_order,
+                'prize1_total_num': prize1_total_num,
+                'prize1_take_count': prize1_take_count,
+                'prize2_total_num': prize2_total_num,
+                'prize2_take_count': prize2_take_count,
+                'prize3_total_num': prize3_total_num,
+                'prize3_take_count': prize3_take_count,
+                'special_prize1_person': special_prize1_person,
+                'special_prize2_person': special_prize2_person
+            }
+        except Exception as e:
+            log.error('HomeConfig ', e)
+            response = {
+                'code': '9999',
+                'desc': '系统异常'
+            }
+        self.write(json.dumps(response, ensure_ascii=False, cls=JsonCustomEncoder))
 
 
 # 停止抽奖
@@ -86,4 +109,42 @@ class LotterySetting(web.RequestHandler):
     @gen.coroutine
     def get(self):
         log.info('抽奖设置')
-        
+        try:
+            lottery_type_order = self.get_argument('lottery_type_order', default='s1,s2,3,2,1')
+            prize1_total_num = self.get_argument('prize1_total_num', default=0)
+            prize1_take_count = self.get_argument('prize1_take_count', default=0)
+            prize2_total_num = self.get_argument('prize2_total_num', default=0)
+            prize2_take_count = self.get_argument('prize2_take_count', default=0)
+            prize3_total_num = self.get_argument('prize3_total_num', default=0)
+            prize3_take_count = self.get_argument('prize3_take_count', default=0)
+            special_prize1_person = self.get_argument('special_prize1_person')
+            special_prize2_person = self.get_argument('special_prize2_person')
+            update_config_val('lottery_type_order', lottery_type_order)
+            update_config_val('prize1_total_num', prize1_total_num)
+            update_config_val('prize1_take_count', prize1_take_count)
+            update_config_val('prize2_total_num', prize2_total_num)
+            update_config_val('prize2_take_count', prize2_take_count)
+            update_config_val('prize3_total_num', prize3_total_num)
+            update_config_val('prize3_take_count', prize3_take_count)
+            update_config_val('special_prize1_person', special_prize1_person)
+            update_config_val('special_prize2_person', special_prize2_person)
+            response = {
+                'code': '0000',
+                'desc': '交易成功'
+            }
+        except Exception as e:
+            log.error('LotterySetting ', e)
+            response = {
+                'code': '9999',
+                'desc': '系统异常'
+            }
+        self.write(json.dumps(response, ensure_ascii=False, cls=JsonCustomEncoder))
+
+
+# 重置设置
+class Reset(web.RequestHandler):
+    @gen.coroutine
+    def get(self):
+        log.info('重置设置')
+        find_persons('S', )
+
