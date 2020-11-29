@@ -10,14 +10,15 @@ from model import Person, Config
 db = DBTool()
 
 
-# 查询人员
-def find_persons(status, appoint_prize1, appoint_prize2):
-    sql = "SELECT * FROM PERSON WHERE STATUS = ? AND APPOINT_PRIZE1 = ? AND APPOINT_PRIZE2 = ?"
-    result = db.query(sql, [status, appoint_prize1, appoint_prize2])
+# 查询参与抽奖的人员
+def find_join_persons():
+    sql = "SELECT p.E_NAME, p.C_NAME, p.URL from PERSON p left join PERSON_WIN pw on p.E_NAME == pw.E_NAME where pw.E_NAME is null"
+    result = db.query(sql, [])
     persons = []
     for r in result:
-        persons.append(Person(r[0], r[1], r[2], r[3]))
-        
+        persons.append(Person(r[0], r[1], r[2]).__dict__)
+    return persons
+
 
 # 人员更新为中奖
 def update_lucky_dog(name, win):
@@ -62,7 +63,9 @@ class HomeConfig(web.RequestHandler):
     def get(self):
         log.info('获取配置')
         try:
-            lottery_type_order = find_config_val('lottery_type_orde')
+            lottery_type_order = find_config_val('lottery_type_order')
+            prize0_total_num = find_config_val('prize0_total_num')
+            prize0_take_count = find_config_val('prize0_take_count')
             prize1_total_num = find_config_val('prize1_total_num')
             prize1_take_count = find_config_val('prize1_take_count')
             prize2_total_num = find_config_val('prize2_total_num')
@@ -71,10 +74,13 @@ class HomeConfig(web.RequestHandler):
             prize3_take_count = find_config_val('prize3_take_count')
             special_prize1_person = find_config_val('special_prize1_person')
             special_prize2_person = find_config_val('special_prize2_person')
+            persons = find_join_persons()
             response = {
                 'code':'0000',
                 'desc':'交易成功',
                 'lottery_type_order': lottery_type_order,
+                'prize0_total_num': prize0_total_num,
+                'prize0_take_count': prize0_take_count,
                 'prize1_total_num': prize1_total_num,
                 'prize1_take_count': prize1_take_count,
                 'prize2_total_num': prize2_total_num,
@@ -82,7 +88,8 @@ class HomeConfig(web.RequestHandler):
                 'prize3_total_num': prize3_total_num,
                 'prize3_take_count': prize3_take_count,
                 'special_prize1_person': special_prize1_person,
-                'special_prize2_person': special_prize2_person
+                'special_prize2_person': special_prize2_person,
+                'persons': persons
             }
         except Exception as e:
             log.error('HomeConfig ', e)

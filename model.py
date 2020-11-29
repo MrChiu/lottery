@@ -3,15 +3,13 @@
 
 # 人员信息
 class Person(object):
-    def __init__(self, name, pic, status, win):
+    def __init__(self, e_name, c_name, url):
         # 姓名
-        self.name = name
+        self.e_name = e_name
+        self.c_name = c_name
         # 头像
-        self.pic = pic
-        # 状态(I:未中奖 S:已中奖)
-        self.status = status
-        # 中奖(1,2,3)
-        self.win = win
+        self.url = url
+
 
 
 # 配置信息
