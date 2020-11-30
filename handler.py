@@ -16,7 +16,7 @@ def find_join_persons():
     result = db.query(sql, [])
     persons = []
     for r in result:
-        persons.append(Person(r[0], r[1], r[2]).__dict__)
+        persons.append(Person(r[0], r[1], r[2]))  # .__dict__
     return persons
 
 
@@ -74,7 +74,14 @@ class HomeConfig(web.RequestHandler):
             prize3_take_count = find_config_val('prize3_take_count')
             special_prize1_person = find_config_val('special_prize1_person')
             special_prize2_person = find_config_val('special_prize2_person')
-            persons = find_join_persons()
+            persons = []
+            for person in find_join_persons():
+                if person.e_name in special_prize1_person:
+                    person.set_join_type('S1')
+                elif person.e_name in special_prize2_person:
+                    person.set_join_type('S2')
+                persons.append(person.__dict__)
+            
             response = {
                 'code':'0000',
                 'desc':'交易成功',

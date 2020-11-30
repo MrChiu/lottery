@@ -9,6 +9,11 @@ class Person(object):
         self.c_name = c_name
         # 头像
         self.url = url
+        # 参与类型 N:普通  S1: 优先1等奖   S2:优先2等奖
+        self.join_type = 'N'
+
+    def set_join_type(self, join_type):
+        self.join_type = join_type
 
 
 
