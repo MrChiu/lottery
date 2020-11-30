@@ -20,22 +20,16 @@ def find_join_persons():
     return persons
 
 
-# 人员更新为中奖
-def update_lucky_dog(name, win):
-    sql = "UPDATE PERSON SET STATUS = 'S', WIN = ? WHERE NAME = ?"
-    return db.save(sql, [(win, name)])
+# 记录中奖人员
+def add_lucky_dog(name, win):
+    sql = "INSERT INTO PERSON_WIN (E_NAME, C_NAME, WIN) VALUES(?, ?, ?);"
+    return db.save(sql, [(name, name, win)])
 
 
-# 人员更新为指定抽一等奖
-def update_appoint_prize1(name):
-    sql = "UPDATE PERSON SET APPOINT_PRIZE1 = 'Y' WHERE NAME = ?"
-    return db.save(sql, [(name,)])
-
-
-# 人员更新为指定抽二等奖
-def update_appoint_prize2(name):
-    sql = "UPDATE PERSON SET APPOINT_PRIZE2 = 'Y' WHERE NAME = ?"
-    return db.save(sql, [(name,)])
+# 重置中奖人员
+def reset_lucky_dog():
+    sql = "DELETE FROM PERSON_WIN"
+    db.delete(sql, [])
 
 
 # 查询配置
@@ -110,9 +104,14 @@ class HomeConfig(web.RequestHandler):
 # 停止抽奖
 class LotteryStop(web.RequestHandler):
     @gen.coroutine
-    def get(self):
+    def post(self, *args, **kwargs):
         log.info('停止抽奖')
-
+        post_data = self.request.body_arguments
+        post_data = {x: post_data.get(x)[0].decode("utf-8") for x in post_data.keys()}
+        if not post_data:
+            post_data = self.request.body.decode('utf-8')
+            post_data = json.loads(post_data)
+        print(post_data)
 
         response = []
         self.write(json.dumps(response, cls=JsonCustomEncoder))
@@ -124,7 +123,9 @@ class LotterySetting(web.RequestHandler):
     def get(self):
         log.info('抽奖设置')
         try:
-            lottery_type_order = self.get_argument('lottery_type_order', default='s1,s2,3,2,1')
+            lottery_type_order = self.get_argument('lottery_type_order', default='s1,s2,3,2,1,0')
+            prize0_total_num = self.get_argument('prize0_total_num', default=0)
+            prize0_take_count = self.get_argument('prize0_take_count', default=0)
             prize1_total_num = self.get_argument('prize1_total_num', default=0)
             prize1_take_count = self.get_argument('prize1_take_count', default=0)
             prize2_total_num = self.get_argument('prize2_total_num', default=0)
@@ -134,6 +135,8 @@ class LotterySetting(web.RequestHandler):
             special_prize1_person = self.get_argument('special_prize1_person')
             special_prize2_person = self.get_argument('special_prize2_person')
             update_config_val('lottery_type_order', lottery_type_order)
+            update_config_val('prize0_total_num', prize0_total_num)
+            update_config_val('prize0_take_count', prize0_take_count)
             update_config_val('prize1_total_num', prize1_total_num)
             update_config_val('prize1_take_count', prize1_take_count)
             update_config_val('prize2_total_num', prize2_total_num)
@@ -160,5 +163,5 @@ class Reset(web.RequestHandler):
     @gen.coroutine
     def get(self):
         log.info('重置设置')
-        find_persons('S', )
+        reset_lucky_dog()
 
