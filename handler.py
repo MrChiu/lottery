@@ -1,8 +1,6 @@
 #!/Users/qiudong/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
-import os
-import re
 from tornado import gen, web
 import logging as log
 import json
@@ -74,7 +72,7 @@ class BaseHandler(web.RequestHandler):
     #  允许跨域访问的地址
     def set_default_headers(self):
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Headers', '*')
+        # self.set_header('Access-Control-Allow-Headers', '*')
         self.set_header('Access-Control-Max-Age', 1000)
         self.set_header('Content-type', 'application/json')
         self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
@@ -137,11 +135,8 @@ class Luckydog(BaseHandler):
     def post(self, *args, **kwargs):
         try:
             log.info('停止抽奖')
-            post_data = self.request.body_arguments
-            post_data = {x: post_data.get(x)[0].decode("utf-8") for x in post_data.keys()}
-            if not post_data:
-                post_data = self.request.body.decode('utf-8')
-                post_data = json.loads(post_data)
+            post_data = self.request.body.decode('utf-8')
+            post_data = json.loads(post_data)
             print(post_data)
             win_type = post_data.get("win_type")
             lucky_dogs = post_data.get("lucky_dogs")
@@ -166,26 +161,23 @@ class LotterySetting(BaseHandler):
     def post(self):
         log.info('抽奖设置')
         try:
-            post_data = self.request.body_arguments
-            post_data = {x: post_data.get(x)[0].decode("utf-8") for x in post_data.keys()}
-            if not post_data:
-                post_data = self.request.body.decode('utf-8')
-                post_data = json.loads(post_data)
+            post_data = self.request.body.decode('utf-8')
+            post_data = json.loads(post_data)
             print(post_data)
-            if not post_data:
+            if post_data:
                 lottery_type_order = post_data.get('lottery_type_order')
-                prize0_total_num = post_data.get('prize0_total_num', default=0)
-                prize0_take_count = post_data.get('prize0_take_count', default=0)
-                prize1_total_num = post_data.get('prize1_total_num', default=0)
-                prize1_take_count = post_data.get('prize1_take_count', default=0)
-                prize2_total_num = post_data.get('prize2_total_num', default=0)
-                prize2_take_count = post_data.get('prize2_take_count', default=0)
-                prize3_total_num = post_data.get('prize3_total_num', default=0)
-                prize3_take_count = post_data.get('prize3_take_count', default=0)
-                prize4_total_num = post_data.get('prize4_total_num', default=0)
-                prize4_take_count = post_data.get('prize4_take_count', default=0)
-                prize5_total_num = post_data.get('prize5_total_num', default=0)
-                prize5_take_count = post_data.get('prize5_take_count', default=0)
+                prize0_total_num = post_data.get('prize0_total_num')
+                prize0_take_count = post_data.get('prize0_take_count')
+                prize1_total_num = post_data.get('prize1_total_num')
+                prize1_take_count = post_data.get('prize1_take_count')
+                prize2_total_num = post_data.get('prize2_total_num')
+                prize2_take_count = post_data.get('prize2_take_count')
+                prize3_total_num = post_data.get('prize3_total_num')
+                prize3_take_count = post_data.get('prize3_take_count')
+                prize4_total_num = post_data.get('prize4_total_num')
+                prize4_take_count = post_data.get('prize4_take_count')
+                prize5_total_num = post_data.get('prize5_total_num')
+                prize5_take_count = post_data.get('prize5_take_count')
                 special_prize1_person = post_data.get('special_prize1_person')
                 special_prize2_person = post_data.get('special_prize2_person')
                 update_config_val('lottery_type_order', lottery_type_order)
@@ -257,16 +249,4 @@ class Output(BaseHandler):
                 'desc': '系统异常'
             }
         self.write(json.dumps(response, ensure_ascii=False, cls=JsonCustomEncoder))
-        
-
-
-# for root, dirs, files in os.walk('C:/Users/dongqiu/Desktop/photos/'):
-#     # 将文件名拆分为文件名与后缀 (filename, extension) = os.path.splitext(file)
-#     # 判断该后缀是否为.pyd文件
-#     pyd_files = [file for file in files if os.path.splitext(file)[1] == '.jpg']
-#     # 遍历刚获得的文件名files
-#     for file in pyd_files:
-#         name = file.split('.')[0]
-#         url = '/photos/%s' % file
-#         add_person(name, url)
         
