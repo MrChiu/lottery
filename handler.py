@@ -85,17 +85,53 @@ class HomeConfig(BaseHandler):
     def get(self):
         log.info('获取配置')
         try:
+            response = {'code': '0000',
+                        'desc': '交易成功'}
             lottery_type_order = find_config_val('lottery_type_order')
-            prize0_total_num = find_config_val('prize0_total_num')
-            prize0_take_count = find_config_val('prize0_take_count')
-            prize1_total_num = find_config_val('prize1_total_num')
-            prize1_take_count = find_config_val('prize1_take_count')
-            prize2_total_num = find_config_val('prize2_total_num')
-            prize2_take_count = find_config_val('prize2_take_count')
-            prize3_total_num = find_config_val('prize3_total_num')
-            prize3_take_count = find_config_val('prize3_take_count')
+            response['lottery_type_order'] = lottery_type_order
+            lottery_type_array = lottery_type_order.split(',')
+
+            if '0' in lottery_type_array:
+                prize0_total_num = find_config_val('prize0_total_num')
+                prize0_take_count = find_config_val('prize0_take_count')
+                response['prize0_total_num'] = prize0_total_num
+                response['prize0_take_count'] = prize0_take_count
+
+            if '1' in lottery_type_array:
+                prize1_total_num = find_config_val('prize1_total_num')
+                prize1_take_count = find_config_val('prize1_take_count')
+                response['prize1_total_num'] = prize1_total_num
+                response['prize1_take_count'] = prize1_take_count
+            
+            if '2' in lottery_type_array:
+                prize2_total_num = find_config_val('prize2_total_num')
+                prize2_take_count = find_config_val('prize2_take_count')
+                response['prize2_total_num'] = prize2_total_num
+                response['prize2_take_count'] = prize2_take_count
+
+            if '3' in lottery_type_array:
+                prize3_total_num = find_config_val('prize3_total_num')
+                prize3_take_count = find_config_val('prize3_take_count')
+                response['prize3_total_num'] = prize3_total_num
+                response['prize3_take_count'] = prize3_take_count
+
+            if '4' in lottery_type_array:
+                prize4_total_num = find_config_val('prize4_total_num')
+                prize4_take_count = find_config_val('prize4_take_count')
+                response['prize4_total_num'] = prize4_total_num
+                response['prize4_take_count'] = prize4_take_count
+
+            if '5' in lottery_type_array:
+                prize5_total_num = find_config_val('prize5_total_num')
+                prize5_take_count = find_config_val('prize5_take_count')
+                response['prize5_total_num'] = prize5_total_num
+                response['prize5_take_count'] = prize5_take_count
+
             special_prize1_person = find_config_val('special_prize1_person')
+            response['special_prize1_person'] = special_prize1_person
             special_prize2_person = find_config_val('special_prize2_person')
+            response['special_prize2_person'] = special_prize2_person
+
             persons = []
             for person in find_join_persons():
                 if person.e_name in special_prize1_person:
@@ -103,23 +139,7 @@ class HomeConfig(BaseHandler):
                 elif person.e_name in special_prize2_person:
                     person.set_join_type('S2')
                 persons.append(person.__dict__)
-            
-            response = {
-                'code':'0000',
-                'desc':'交易成功',
-                'lottery_type_order': lottery_type_order,
-                'prize0_total_num': prize0_total_num,
-                'prize0_take_count': prize0_take_count,
-                'prize1_total_num': prize1_total_num,
-                'prize1_take_count': prize1_take_count,
-                'prize2_total_num': prize2_total_num,
-                'prize2_take_count': prize2_take_count,
-                'prize3_total_num': prize3_total_num,
-                'prize3_take_count': prize3_take_count,
-                'special_prize1_person': special_prize1_person,
-                'special_prize2_person': special_prize2_person,
-                'persons': persons
-            }
+            response['persons'] = persons
         except Exception as e:
             log.error('HomeConfig ', e)
             response = {
@@ -249,4 +269,3 @@ class Output(BaseHandler):
                 'desc': '系统异常'
             }
         self.write(json.dumps(response, ensure_ascii=False, cls=JsonCustomEncoder))
-        
