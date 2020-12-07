@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNC贷款科技产品部抽奖程序</title>
+  <script src="js/jquery.js"></script>
+</head>
+<style type="text/css">
+.content div{
+  margin-bottom: 20px;
+}
+.content input{
+  height: 30px;
+  width: 250px;
+  padding: 0 10px;
+}
+button{
+  width: 100px;
+  height: 30px;
+  border-radius: 3px;
+  background: #04a5fe;
+  color: #ffffff;
+  text-align: center;
+  margin: 0 auto;
+}
+  .item{}
+</style>
+<body>
+  <div>
+    <h3>设置中奖信息</h3>
+    <div class="content">
+      <form class="form">
+        <div class="item">
+          <label for="">奖项配置(s1,s2,5,4,3,2,1,0):</label>
+          <input type="text" name='lottery_type_order' placeholder="用逗号隔开" />
+        </div>
+        <div class="item">
+          <label for="">优先一等奖:</label>
+          <input type="text" name='special_prize1_person' placeholder="请输入优先一等奖抽取人，用逗号隔开"/>
+        </div>
+        <div>
+          <label for="">优先二等奖:</label>
+          <input type="text" name='special_prize2_person' placeholder="请输入优先二等奖抽取人，用逗号隔开"/>
+        </div>
+        <div>
+          <label for="">特等奖:</label>
+          <input type="text" name='prize0_total_num' placeholder="请输入特等奖奖品总数"/>
+          <input type="text" name='prize0_take_count' placeholder="请输入特等奖单次开奖人数"/>
+        </div>
+        <div>
+          <label for="">一等奖:</label>
+          <input type="text" name='prize1_total_num' placeholder="请输入一等奖奖品总数"/>
+          <input type="text" name='prize1_take_count' placeholder="请输入一等奖单次开奖人数"/>
+        </div>
+        <div>
+          <label for="">二等奖:</label>
+          <input type="text" name='prize2_total_num' placeholder="请输入二等奖奖品总数"/>
+          <input type="text" name='prize2_take_count' placeholder="请输入二等奖单次开奖人数"/>
+        </div>
+        <div>
+          <label for="">三等奖:</label>
+          <input type="text" name='prize3_total_num' placeholder="请输入三等奖奖品总数"/>
+          <input type="text" name='prize3_take_count' placeholder="请输入三等奖单次开奖人数"/>
+        </div>
+        <div>
+          <label for="">四等奖:</label>
+          <input type="text" name='prize4_total_num' placeholder="请输入四等奖奖品总数"/>
+          <input type="text" name='prize4_take_count' placeholder="请输入四等奖一次抽几个人"/>
+        </div>
+        <div>
+          <label for="">五等奖:</label>
+          <input type="text" name='prize5_total_num' placeholder="请输入五等奖奖品总数"/>
+          <input type="text" name='prize5_take_count' placeholder="请输入五等奖单次开奖人数"/>
+        </div>
+        <div>
+          <button type="submit" >提交</button>
+        </div>
+        <div>
+          <button type="button" onclick="import_person()">导入抽奖名单</button>
+          <button type="button" onclick="output()">导出抽奖结果</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+  $('.form').submit(function(){
+    console.log($(".form").serializeArray())
+    var paramArray = $(".form").serializeArray()
+    var param ={}
+    paramArray.forEach(e=>{
+      if(e.value){
+        param[e.name]=e.value
+      }
+    })
+    console.log(param)
+    if(param['prize0_total_num'] && param['prize0_take_count']>1 ){
+      alert("特等奖每次最多抽1个人")
+      return
+    }
+    if(param['prize1_total_num'] && param['prize1_take_count']>2 ){
+      alert("一等奖每次最多抽2个人")
+      return
+    }
+    if(param['prize2_total_num'] && param['prize2_take_count']>7 ){
+      alert("二等奖每次最多抽7个人")
+      return
+    }
+    if(param['prize3_total_num'] && param['prize3_take_count']>13 ){
+      alert("三等奖每次最多抽13个人")
+      return
+    }
+    if(param['prize4_total_num'] && param['prize4_take_count']>13 ){
+      alert("三等奖每次最多抽13个人")
+      return
+    }
+    if(param['prize5_total_num'] && param['prize5_take_count']>13 ){
+      alert("三等奖每次最多抽13个人")
+      return
+    }
+    $.ajax({
+      method:'post',
+      url:'http://localhost:8888/setting',
+      data: JSON.stringify(param),
+      success:function(res){
+        if(res.code=='0000'){
+          alert("保存成功")
+        }
+      }
+    })
+    return false
+  })
+
+  $.ajax({
+    type:'get',
+    url:'http://localhost:8888/',
+    success: function(data){
+      $("input[name='special_prize1_person']").val(data.special_prize1_person)
+      $("input[name='special_prize2_person']").val(data.special_prize2_person)
+      $("input[name='prize0_total_num']").val(data.prize0_total_num)
+      $("input[name='prize0_take_count']").val(data.prize0_take_count)
+      $("input[name='prize1_total_num']").val(data.prize1_total_num)
+      $("input[name='prize1_take_count']").val(data.prize1_take_count)
+      $("input[name='prize2_total_num']").val(data.prize2_total_num)
+      $("input[name='prize2_take_count']").val(data.prize2_take_count)
+      $("input[name='prize3_total_num']").val(data.prize3_total_num)
+      $("input[name='prize3_take_count']").val(data.prize3_take_count)
+      $("input[name='prize4_total_num']").val(data.prize4_total_num)
+      $("input[name='prize4_take_count']").val(data.prize4_take_count)
+      $("input[name='prize5_total_num']").val(data.prize5_total_num)
+      $("input[name='prize5_take_count']").val(data.prize5_take_count)
+      $("input[name='lottery_type_order']").val(data.lottery_type_order)
+    }
+  })
+
+  function output() {
+    $.ajax({
+      method: 'get',
+      url: 'http://localhost:8888/output',
+      success: function (res) {
+        if (res.code == '0000') {
+          alert("导出成功")
+        }
+      }
+    })
+  }
+
+  function import_person() {
+    $.ajax({
+      method: 'get',
+      url: 'http://localhost:8888/import',
+      success: function (res) {
+        if (res.code == '0000') {
+          alert("导入成功")
+        }
+      }
+    })
+  }
+</script>
+</html>

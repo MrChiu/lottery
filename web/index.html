@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>CNC贷款科技产品部抽奖程序</title>
+    <link rel='stylesheet' href='css/animate.css'>
+    <link rel='stylesheet' href='css/style.css?v=0.0.5'>
+</head>
+
+<body>
+    <!--自定义抽奖-->
+    <div class="custom-draw">
+    </div>
+    <!--音乐开关-->
+    <a id="musicButton" class="music-button" href="javascript:;" data-open="1"></a>
+    <!--自定义抽奖开关-->
+    <a id="settingButton" class="setting-button" href="setting.html" data-open="1"></a>
+    <!--清除数据开关-->
+    <a id="clearButton" class="clear-button" href="javascript:;" data-open="1"></a>
+    <audio id="music" loop="loop" preload="auto" src="winner.mp3">
+        你的浏览器不支持audio标签
+    </audio>
+
+    <!-- 抽奖图片 -->
+    <div class="container">
+        <!-- 优一 优二 -->
+        <div id="gallery-one" class="galleryContainer" style="display: none;">
+            <table>
+                <tr>
+                    <td class="t1 item active" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t2 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t3 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t4 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t5 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t6 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t7 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t8 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t9 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t10 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                </tr>
+                <tr>
+                    <td class="t24 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td colspan="8" rowspan="2" class="img-wrap">
+                        <ul class="galleryWrap"></ul>
+                    </td>
+                    <td class="t11 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                </tr>
+                <tr>
+                    <td class="t23 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t12 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                </tr>
+                <tr>
+                    <td class="t22 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t21 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t20 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t19 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t18 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t17 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t16 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t15 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t14 item" data-win='0'><a class="item_a" href="javascript:;"></a></td>
+                    <td class="t13 item" data-win='1'><a class="item_a" href="javascript:;"></a></td>
+                </tr>
+            </table>
+        </div>
+        <ul id='gallery' class="galleryContainer" style="display: none;"></ul>
+    </div>
+    <div style="clear:both;"></div>
+    <!-- 抽奖按钮 -->
+    <div class="footer" style="display: none;">
+        <button id="action" class="button-action" data-action="start">立即抽奖</button>
+    </div>
+    <!-- 中奖弹窗 -->
+    <div class="pop-up" style="display: none">
+        <div class="pop-up-bg"></div>
+        <!-- 未中奖 -->
+        <div class="pop-up-content prize-no" id="prize-no" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 优先奖 -->
+        <div class="pop-up-content prize-s1 prize-s2" id="prize-s" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_nos@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 特等奖 -->
+        <div class="pop-up-content prize-0" id="prize-0" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no0@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 一等奖 -->
+        <div class="pop-up-content prize-1" id="prize-1" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no1@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 二等奖 -->
+        <div class="pop-up-content prize-2" id="prize-2" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no2@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 三等奖 -->
+        <div class="pop-up-content prize-3" id="prize-3" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no3@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 四等奖 -->
+        <div class="pop-up-content prize-4" id="prize-4" style="display: none">
+            <div class="lottery-img">
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no4@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+        <!-- 五等奖 -->
+        <div class="pop-up-content prize-5" id="prize-5" style="display: none">
+            <div class="lottery-img">
+                <!-- 关闭按钮 -->
+                <div class="pop-up-close"></div>
+                <img src="./images/bg_no5@2x.png" alt="" width="100%" />
+            </div>
+            <ul class="user-group">
+            </ul>
+        </div>
+    </div>
+    <script src='js/jquery.js'></script>
+    <script src="js/index.js?v=0.0.5"></script>
+    <script type="text/javascript">
+    </script>
+</body>
+</html>
