@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import filecmp
 import sqlite3
 import logging as log
 import json
