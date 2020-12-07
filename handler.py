@@ -1,6 +1,9 @@
 #!/Users/qiudong/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+current_file_path = os.path.dirname(os.path.abspath(__file__))
+import re
 from tornado import gen, web
 import logging as log
 import json
@@ -27,6 +30,16 @@ def find_join_persons():
     return persons
 
 
+# 根据中奖类型查询中奖人数
+def find_lucky_dog_bytype(win_type):
+    sql = "SELECT COUNT(1) FROM PERSON_WIN WHERE WIN = ?"
+    temp = db.query(sql, [win_type])
+    result = []
+    for r in temp:
+        result.append(r[0])
+    return result[0]
+
+
 # 查询中奖人员
 def find_lucky_dog():
     sql = "SELECT E_NAME, WIN FROM PERSON_WIN"
@@ -39,7 +52,7 @@ def find_lucky_dog():
 
 # 记录中奖人员
 def add_lucky_dog(name, win):
-    sql = "INSERT INTO PERSON_WIN (E_NAME, C_NAME, WIN) VALUES(?, ?, ?);"
+    sql = "INSERT INTO PERSON_WIN (E_NAME, C_NAME, WIN) VALUES(?, ?, ?)"
     return db.save(sql, [(name, name, win)])
 
 
@@ -153,18 +166,35 @@ class Luckydog(BaseHandler):
     @gen.coroutine
     def post(self, *args, **kwargs):
         try:
-            log.info('停止抽奖')
+            log.info('抽奖结果')
+            response = {}
             post_data = self.request.body.decode('utf-8')
             post_data = json.loads(post_data)
-            print(post_data)
             win_type = post_data.get("win_type")
             lucky_dogs = post_data.get("lucky_dogs")
-            for dog in lucky_dogs:
-                add_lucky_dog(dog, win_type)
-            response = {
-                'code': '0000',
-                'desc': '交易成功'
-            }
+            new_num = len(lucky_dogs)
+            now_num = find_lucky_dog_bytype(win_type)
+
+            if win_type == 's1' or win_type == 's2':
+                limit_num = len(find_config_val('special_prize%s_person' % win_type[1:]).split(','))
+                if now_num + new_num > limit_num:
+                    response['code'] = '9999'
+                    response['desc'] = '超出奖品限额'
+                else:
+                    for dog in lucky_dogs:
+                        add_lucky_dog(dog, win_type)
+                    response['code'] = '0000'
+                    response['desc'] = '交易成功'
+            else:
+                limit_num = int(find_config_val('prize%s_total_num' % win_type))
+                if now_num + new_num > limit_num:
+                    response['code'] = '9999'
+                    response['desc'] = '超出奖品限额'
+                else:
+                    for dog in lucky_dogs:
+                        add_lucky_dog(dog, win_type)
+                    response['code'] = '0000'
+                    response['desc'] = '交易成功'
         except Exception as e:
             log.error('Luckydog ', e)
             response = {
@@ -182,7 +212,6 @@ class LotterySetting(BaseHandler):
         try:
             post_data = self.request.body.decode('utf-8')
             post_data = json.loads(post_data)
-            print(post_data)
             if post_data:
                 lottery_type_order = post_data.get('lottery_type_order')
                 prize0_total_num = post_data.get('prize0_total_num')
@@ -257,6 +286,34 @@ class Output(BaseHandler):
             result = find_lucky_dog()
             if result:
                 common.output(result)
+            response = {
+                'code': '0000',
+                'desc': '交易成功'
+            }
+        except Exception as e:
+            log.error('Output ', e)
+            response = {
+                'code': '9999',
+                'desc': '系统异常'
+            }
+        self.write(json.dumps(response, ensure_ascii=False, cls=JsonCustomEncoder))
+
+
+# 导入名单
+class Import(BaseHandler):
+    @gen.coroutine
+    def get(self):
+        try:
+            log.info('导入名单')
+            for root, dirs, files in os.walk(os.path.join(current_file_path, 'photos')):
+                # 将文件名拆分为文件名与后缀 (filename, extension) = os.path.splitext(file)
+                # 判断该后缀是否为.pyd文件
+                pyd_files = [file for file in files if os.path.splitext(file)[1] == '.jpg']
+                # 遍历刚获得的文件名files
+                for file in pyd_files:
+                    name = file.split('.')[0]
+                    url = '/photos/%s' % file
+                    add_person(name, url)
             response = {
                 'code': '0000',
                 'desc': '交易成功'
