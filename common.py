@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import filecmp
 import sqlite3
 import logging as log
 import json
@@ -15,12 +16,7 @@ class DBTool(object):
         """
         self.conn = sqlite3.connect('lottery.db')
         self.dbcur = self.conn.cursor()
-        # self.dbcur.execute('''CREATE TABLE IF NOT EXISTS TEST
-        #     (ID INT PRIMARY KEY     NOT NULL,
-        #     NAME           TEXT    NOT NULL,
-        #     AGE            INT     NOT NULL,
-        #     ADDRESS        CHAR(50),
-        #     SALARY         REAL);''')
+        
 
     def table(self, sql):
         try:
@@ -108,3 +104,13 @@ class JsonCustomEncoder(json.JSONEncoder):
             return obj.strftime('%Y-%m-%d')
         else:
             return json.JSONEncoder.default(self, obj)
+
+
+def output(result):
+    temp = []
+    for r in result:
+        r = r+'\n'
+        temp.append(r)
+    f = open('result.txt', 'w')
+    f.writelines(temp)
+    f.close()

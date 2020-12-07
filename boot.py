@@ -3,15 +3,18 @@
 
 import os.path
 from tornado import options, web, httpserver, ioloop
-from handler import HomeConfig, LotteryStop, LotterySetting, Reset
+from handler import HomeConfig, Luckydog, LotterySetting, Reset, Output
 
 class Application(web.Application):
     def __init__(self):
         handlers = [
             (r"/", HomeConfig),
-            (r"/stop", LotteryStop),
+            (r"/lucky_dog", Luckydog),
             (r"/setting", LotterySetting),
-            (r"/reset", Reset)
+            # 重置
+            (r"/reset", Reset),
+            # 结果导出
+            (r"/output", Output)
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
