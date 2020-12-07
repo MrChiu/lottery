@@ -1,4 +1,3 @@
-#!/Users/qiudong/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
 import os

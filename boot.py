@@ -1,7 +1,8 @@
-#! ~/opt/anaconda3/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
 import os.path
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from tornado import options, web, httpserver, ioloop
 from handler import HomeConfig, Luckydog, LotterySetting, Reset, Output, Import
 
