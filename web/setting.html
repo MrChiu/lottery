@@ -32,6 +32,12 @@ button{
     <div class="content">
       <form class="form">
         <div class="item">
+          <label for="" style="color: red;">s1,s2,5,4,3,2,1,0分别代表优先1等奖，优先2等奖，5等奖，4等奖，3等奖，2等奖，1等奖，特等奖</label>
+        </div>
+        <div class="item">
+          <label for="" style="color: red;">注意：奖项配置存在的奖项，必须在下面配置数量</label>
+        </div>
+        <div class="item">
           <label for="">奖项配置(s1,s2,5,4,3,2,1,0):</label>
           <input type="text" name='lottery_type_order' placeholder="用逗号隔开" />
         </div>
@@ -75,6 +81,12 @@ button{
         </div>
         <div>
           <button type="submit" >提交</button>
+        </div>
+        <div class="item">
+          <label for="" style="color: red;">导入名单的图片文件请放入项目photos文件夹中，命名为姓名</label>
+        </div>
+        <div class="item">
+          <label for="" style="color: red;">抽奖结果保存在数据库中，点击导出，会在项目目录下生成result.txt</label>
         </div>
         <div>
           <button type="button" onclick="import_person()">导入抽奖名单</button>

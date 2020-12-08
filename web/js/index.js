@@ -371,12 +371,15 @@
           data: JSON.stringify(param),
           success: function (res) {
             if (res.code == '0000') {
+              console.info(`${award}等奖名单:`, winners)
+              $(`.prize-${award}`).show()
+              $('.pop-up').show()
             } else {
               alert(res.desc)
             }
           },
-          error: function (res) {
-              alert('请求失败')
+          error: function (data, status, e) {
+            alert('请求失败')
           }
         })
       }
@@ -764,7 +767,7 @@
                 alert(res.desc)
               }
             },
-            error: function (res) {
+            error: function (data, status, e) {
               alert('请求失败')
             }
           })
@@ -1012,11 +1015,14 @@
           }
         })
         console.log(award, group)
-        $(`.prize-${award}`).show()
-        $('.pop-up').show()
 
         this.saveWinnerInfo(award, winnerInfos)
-        console.info(`${award}等奖名单:`, winnerInfos)
+        // if (result == true) {
+        //   console.info(`${award}等奖名单:`, winnerInfos)
+
+        //   $(`.prize-${award}`).show()
+        //   $('.pop-up').show()
+        // }
       }
     }
 
